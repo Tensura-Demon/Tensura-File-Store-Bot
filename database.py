@@ -79,4 +79,3 @@ async def is_admin(user_id):
     data = await admins.find_one({"user_id": user_id})
 
     return bool(data)
-
