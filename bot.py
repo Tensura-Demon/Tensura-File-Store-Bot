@@ -508,39 +508,27 @@ async def delete_clone_cmd(client, message):
 
 
 # =========================
-# LOAD CLONES
+# START BOT
 # =========================
 
-async def load_all_clones():
+async def main():
 
-    data = await get_all_clones()
+    await load_all_clones()
 
-    for x in data:
+    print("All Clones Loaded")
 
-        try:
+    await app.start()
 
-            await start_clone(
-                x["user_id"],
-                x["bot_token"]
-            )
+    print("Main Bot Started")
 
-            print(f"Started @{x['username']}")
+    idle = asyncio.Event()
 
-        except Exception as e:
+    await idle.wait()
 
-            print(e)
 
-#RUN
 keep_alive()
 
-app.start()
-
-app.loop.run_until_complete(
-    load_all_clones()
-)
-
-print("Main Bot Started")
-asyncio.get_event_loop().run_forever()
+app.run(main())
 
 #don't remove credits 
 #Owner @Mr_Mohammed_29 
