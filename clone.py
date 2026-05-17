@@ -7,28 +7,35 @@ CLONES = {}
 async def start_clone(user_id, bot_token):
 
     if user_id in CLONES:
-        raise Exception("Clone already exists")
+        raise Exception("Clone already running")
 
-    clone_app = Client(
-        f"clone_{user_id}",
+    bot = Client(
+        name=f"clone_{user_id}",
         api_id=API_ID,
         api_hash=API_HASH,
         bot_token=bot_token,
-        no_updates=False
+        workdir="sessions"
     )
 
-    @clone_app.on_message(filters.command("start"))
-    async def start_handler(client, message: Message):
+    @bot.on_message(filters.command("start"))
+    async def start_cmd(client, message: Message):
 
         await message.reply_text(
-            "✅ Clone Bot Working Successfully"
+            "✅ Clone Bot Active"
         )
 
-    await clone_app.start()
+    @bot.on_message(filters.command("ping"))
+    async def ping_cmd(client, message: Message):
 
-    me = await clone_app.get_me()
+        await message.reply_text("🏓 Pong")
 
-    CLONES[user_id] = clone_app
+    await bot.start()
+
+    me = await bot.get_me()
+
+    CLONES[user_id] = bot
+
+    print(f"Started Clone @{me.username}")
 
     return me.username
 
