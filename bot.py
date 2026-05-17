@@ -15,10 +15,8 @@ IMAGES = [
 ]
 from database import (
     save_file, get_file, add_user, get_all_users, total_users,
-    add_admin_db, remove_admin_db, is_admin, get_all_admins, save_clone, get_all_clones, delete_clone
+    add_admin_db, remove_admin_db, is_admin, get_all_admins
 )
-
-from clone import start_clone, stop_clone, CLONES
 
 from keep_alive import keep_alive
 import asyncio
@@ -438,116 +436,10 @@ async def refresh_stats(client, query):
     )
 
     await query.answer("Sᴛᴀᴛs Uᴘᴅᴀᴛᴇᴅ 🔄")   
-
-# =========================
-# CREATE CLONE
-# =========================
-
-@app.on_message(filters.command("clone"))
-async def clone_bot(client, message):
-
-    if len(message.command) < 2:
-
-        return await message.reply_text(
-            "Usage:\n/clone BOT_TOKEN"
-        )
-
-    bot_token = message.command[1]
-
-    status = await message.reply_text(
-        "⏳ Creating clone..."
-    )
-
-    try:
-
-        username = await start_clone(
-            message.from_user.id,
-            bot_token
-        )
-
-        await save_clone(
-            message.from_user.id,
-            bot_token,
-            username
-        )
-
-        await status.edit_text(
-            f"✅ Clone Created\n\n"
-            f"🤖 @{username}"
-        )
-
-    except Exception as e:
-
-        await status.edit_text(
-            f"❌ Failed\n\n{e}"
-        )
-
-
-# =========================
-# DELETE CLONE
-# =========================
-
-@app.on_message(filters.command("deleteclone"))
-async def delete_clone_cmd(client, message):
-
-    user_id = message.from_user.id
-
-    if user_id not in CLONES:
-
-        return await message.reply_text(
-            "❌ No active clone"
-        )
-
-    await stop_clone(user_id)
-
-    await delete_clone(user_id)
-
-    await message.reply_text(
-        "✅ Clone Deleted"
-    )
-
-# =========================
-# LOAD ALL CLONES
-# =========================
-
-async def load_all_clones():
-
-    data = await get_all_clones()
-
-    for x in data:
-
-        try:
-
-            await start_clone(
-                x["user_id"],
-                x["bot_token"]
-            )
-
-            print(f"Started Clone @{x['username']}")
-
-        except Exception as e:
-
-            print(f"Clone Error: {e}")
-
-from pyrogram import idle
-
-async def main():
-
-    await app.start()
-
-    print("Main Bot Started")
-
-    await load_all_clones()
-
-    print("All Clones Loaded")
-
-    await idle()
-
-if __name__ == "__main__":
-
-    keep_alive()
-
-    app.loop.run_until_complete(main())
+    
+#RUN
+keep_alive()
+app.run()
 
 #don't remove credits 
 #Owner @Mr_Mohammed_29 
