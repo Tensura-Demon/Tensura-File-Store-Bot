@@ -79,3 +79,44 @@ async def is_admin(user_id):
     data = await admins.find_one({"user_id": user_id})
 
     return bool(data)
+
+# =========================
+# CLONES
+# =========================
+
+async def save_clone(user_id, bot_token, username):
+
+    data = {
+        "user_id": user_id,
+        "bot_token": bot_token,
+        "username": username
+    }
+
+    await db.clones.update_one(
+        {"user_id": user_id},
+        {"$set": data},
+        upsert=True
+    )
+
+
+async def get_all_clones():
+
+    clones = []
+
+    async for x in db.clones.find():
+        clones.append(x)
+
+    return clones
+
+
+async def delete_clone(user_id):
+
+    await db.clones.delete_one(
+        {"user_id": user_id}
+    )
+
+# ------------------------- #
+# Don't Remove Credit 
+# Ask Doubt @AU_Bot_Discussion 
+# Owner @Mr_Mohammed_29 
+# ------------------------- #
