@@ -32,10 +32,42 @@ app = Client(
     bot_token=BOT_TOKEN
 )
 
-#batch
-import base64 
+import re
+import base64
 
-@app.on_message(filters.command("batch") & filters.private)
+# helper function
+async def get_message_id(client, message: Message):
+    try:
+        if not message.text:
+            return None, None
+
+        link = message.text.strip()
+
+        # private channel
+        if "/c/" in link:
+            parts = link.split("/")
+            chat_id = int("-100" + parts[-2])
+            msg_id = int(parts[-1])
+            return msg_id, chat_id
+
+        # public channel
+        match = re.search(r"t\.me/([^/]+)/(\d+)", link)
+
+        if match:
+            username = match.group(1)
+            msg_id = int(match.group(2))
+
+            chat = await client.get_chat(username)
+
+            return msg_id, chat.id
+
+        return None, None
+
+    except:
+        return None, None
+
+
+#batch
 
 BATCH_USERS = {}
 
@@ -298,27 +330,6 @@ async def save_media(client, message: Message):
 
     await message.reply_text(f"🔗 𝗛𝗲𝗿𝗲 𝗜𝘀 𝗬𝗼𝘂𝗿 𝗟𝗶𝗻𝗸:\n{link}")
 
-#helper
-
-from pyrogram import filters
-from asyncio import Future
-
-class AskMixin:
-    async def ask(self, chat_id, text, filters=filters.text, timeout=60):
-        msg = await self.send_message(chat_id, text)
-
-        future = Future()
-
-        @self.on_message(filters.chat(chat_id) & filters.text)
-        async def handler(client, message):
-            if not future.done():
-                future.set_result(message)
-
-        try:
-            return await asyncio.wait_for(future, timeout)
-        except:
-            return None
-    
 # STATS
 @app.on_message(filters.command("stats") & filters.user(OWNER_ID))
 async def stats(client, message: Message):
