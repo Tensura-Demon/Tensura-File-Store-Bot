@@ -180,7 +180,7 @@ async def start(client, message: Message):
 
     if len(message.command) > 1:
 
-    param = message.command[1]
+        param = message.command[1]
 
     # ================= BATCH LINK =================
     try:
