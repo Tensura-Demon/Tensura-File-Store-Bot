@@ -182,8 +182,40 @@ async def start(client, message: Message):
 
     if len(message.command) > 1:
 
-        param = message.command[1]
+    param = message.command[1]
 
+    else:
+
+         photo = random.choice(IMAGES)
+
+         return await message.reply_photo(
+             photo=photo,
+             caption=(
+                 "𝗛𝗲𝗹𝗹𝗼 ♡,\n\n"
+                 "›› 𝗜 𝗰𝗮𝗻 𝘀𝘁𝗼𝗿𝗲 𝗽𝗿𝗶𝘃𝗮𝘁𝗲 𝗳𝗶𝗹𝗲𝘀 𝗶𝗻 𝗦𝗽𝗲𝗰𝗶𝗳𝗶𝗲𝗱 𝗖𝗵𝗮𝗻𝗻𝗲𝗹 𝗮𝗻𝗱 𝗼𝘁𝗵𝗲𝗿 𝘂𝘀𝗲𝗿𝘀 𝗰𝗮𝗻 𝗮𝗰𝗰𝘀𝘀 𝗶𝘁 ғʀᴏᴍ sᴘᴇᴄɪᴀʟ ʟɪɴᴋ."
+             ),
+             reply_markup=InlineKeyboardMarkup(
+                 [
+                    [
+                         InlineKeyboardButton(
+                             "ᴜᴘᴅᴀᴛᴇs",
+                              url="https://t.me/Anime_UpdatesAU"
+                         ),
+                         InlineKeyboardButton(
+                             "ᴀʙᴏᴜᴛ",
+                             callback_data="about"
+                         )
+                    ],
+                    [
+                         InlineKeyboardButton(
+                             "ᴏᴡɴᴇʀ",
+                             url="https://t.me/+ssaZDrj3Wr4wNzI1"
+                         )
+                    ]
+                ]
+             ),
+             parse_mode=ParseMode.MARKDOWN
+         )
         # ================= BATCH LINK =================
 
         try:
@@ -214,6 +246,8 @@ async def start(client, message: Message):
                 await asyncio.sleep(0.5)
 
                 await x.delete()
+                
+                sent_msgs = []
 
                 for msg_id in range(first_id, last_id + 1):
 
@@ -243,63 +277,81 @@ async def start(client, message: Message):
 
                         if msg.video:
 
-                            await message.reply_video(
+                            sent = await message.reply_video(
                                 msg.video.file_id,
                                 caption=caption,
                                 reply_markup=buttons,
                                 supports_streaming=True,
                                 parse_mode=ParseMode.MARKDOWN
                             )
+                            
+                            sent_msgs.append(sent)
 
                         elif msg.document:
 
-                            await message.reply_document(
+                            sent = await message.reply_document(
                                 msg.document.file_id,
                                 caption=caption,
                                 reply_markup=buttons,
                                 parse_mode=ParseMode.MARKDOWN
                             )
+                            
+                            sent_msgs.append(sent)
 
                         elif msg.audio:
 
-                            await message.reply_audio(
+                            sent = await message.reply_audio(
                                 msg.audio.file_id,
                                 caption=caption,
                                 reply_markup=buttons,
                                 parse_mode=ParseMode.MARKDOWN
                             )
+                            
+                            sent_msgs.append(sent)
 
                         elif msg.animation:
 
-                            await message.reply_animation(
+                            sent = await message.reply_animation(
                                 msg.animation.file_id,
                                 caption=caption,
                                 reply_markup=buttons,
                                 parse_mode=ParseMode.MARKDOWN
                             )
+                            
+                            sent_msgs.append(sent)
 
                         elif msg.sticker:
 
-                            await message.reply_sticker(
+                            sent = await message.reply_sticker(
                                 msg.sticker.file_id
                             )
+                            
+                            sent_msgs.append(sent)
 
                         await asyncio.sleep(0.3)
 
                     except Exception as e:
                         print(e)
 
-                await message.reply_text(
+                warn = await message.reply_text(
                     " ⏳ Dᴜᴇ ᴛᴏ ᴄᴏᴘʏʀɪɢʜᴛ ɪssᴜᴇs...\n\n"
                     " ›› Yᴏᴜʀ ғɪʟᴇs ᴡɪʟʟ ʙᴇ ᴅᴇʟᴇᴛᴇᴅ ᴡɪᴛʜɪɴ 𝟻 ᴍɪɴᴜᴛᴇs.\n"
                     " ›› Sᴏ ᴘʟᴇᴀsᴇ ғᴏʀᴡᴀʀᴅ ᴛʜᴇᴍ ᴛᴏ sᴀᴠᴇᴅ ᴍᴇssᴀɢᴇs.\n\n"
                     " ›› 𝗡𝗼𝘁𝗲: ᴜsᴇ 𝗩𝗟𝗖 𝗣𝗹𝗮𝘆𝗲𝗿 ᴏʀ 𝗠𝗫 𝗣𝗹𝗮𝘆𝗲𝗿 ғᴏʀ ʙᴇsᴛ ᴇxᴘᴇʀɪᴇɴᴄᴇ."
                 )
 
-                return
+                await asyncio.sleep(300)
 
-        except Exception as e:
-            print(e)
+                for msg in sent_msgs:
+                    try:
+                        await msg.delete()
+                    except:
+                        pass
+
+                try:
+                    await warn.delete()
+                except:
+                    pass
 
     # ================= SINGLE FILE =================
 
@@ -409,31 +461,6 @@ async def start(client, message: Message):
 
     except:
         pass
-
-    return
-        
-    # START MESSAGE WITH BUTTONS
-    photo = random.choice(IMAGES)
-
-    await message.reply_photo(
-        photo=photo,
-        caption=(
-            "𝗛𝗲𝗹𝗹𝗼 ♡,\n\n"
-            "›› 𝗜 𝗰𝗮𝗻 𝘀𝘁𝗼𝗿𝗲 𝗽𝗿𝗶𝘃𝗮𝘁𝗲 𝗳𝗶𝗹𝗲𝘀 𝗶𝗻 𝗦𝗽𝗲𝗰𝗶𝗳𝗶𝗲𝗱 𝗖𝗵𝗮𝗻𝗻𝗲𝗹 𝗮𝗻𝗱 𝗼𝘁𝗵𝗲𝗿 𝘂𝘀𝗲𝗿𝘀 𝗰𝗮𝗻 𝗮𝗰𝗰𝘀𝘀 𝗶𝘁 𝗳𝗿𝗼𝗺 𝘀𝗽𝗲𝗰𝗶𝗮𝗹 𝗹𝗶𝗻𝗸."
-        ),
-        reply_markup=InlineKeyboardMarkup(
-            [
-                [
-                    InlineKeyboardButton("ᴜᴘᴅᴀᴛᴇs", url="https://t.me/Anime_UpdatesAU"),
-                    InlineKeyboardButton("ᴀʙᴏᴜᴛ", callback_data="about")
-                ],
-                [
-                    InlineKeyboardButton("ᴏᴡɴᴇʀ", url="https://t.me/+ssaZDrj3Wr4wNzI1")
-                ]
-            ]
-        ),
-        parse_mode=ParseMode.MARKDOWN
-    )
 
 # ONLY OWNER + ADMIN CAN UPLOAD 
 @app.on_message(
