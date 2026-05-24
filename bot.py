@@ -162,7 +162,9 @@ async def handle_batch(client, message: Message):
 # START + LINK HANDLER
 @app.on_message(filters.command("start"))
 async def start(client, message: Message):
+    
     user_id = message.from_user.id
+    
     await add_user(message.from_user.id)
 
     # START ANIMATION
@@ -182,117 +184,122 @@ async def start(client, message: Message):
 
         param = message.command[1]
 
-    # ================= BATCH LINK =================
+        # ================= BATCH LINK =================
 
-    try:
+        try:
 
-        decoded = base64.urlsafe_b64decode(
-            param + "=" * (-len(param) % 4)
-        ).decode()
+            decoded = base64.urlsafe_b64decode(
+                param + "=" * (-len(param) % 4)
+            ).decode()
 
-        if decoded.startswith("get-"):
+            if decoded.startswith("get-"):
 
-            _, first_id, last_id = decoded.split("-")
+                _, first_id, last_id = decoded.split("-")
 
-            first_id = int(first_id)
-            last_id = int(last_id)
+                first_id = int(first_id)
+                last_id = int(last_id)
 
-            x = await message.reply_text("🔗 ғɪʟᴇs ʟɪɴᴋs ɢᴇɴᴇʀᴀᴛᴇᴅ...")
+                x = await message.reply_text(
+                    "🔗 ғɪʟᴇs ʟɪɴᴋs ɢᴇɴᴇʀᴀᴛᴇᴅ..."
+                )
 
-            await asyncio.sleep(0.5)
+                await asyncio.sleep(0.5)
 
-            await x.edit_text("✨️ ғɪʟᴇs ʟᴏᴀᴅɪɴɢ...")
+                await x.edit_text("✨️ ғɪʟᴇs ʟᴏᴀᴅɪɴɢ...")
 
-            await asyncio.sleep(0.5)
+                await asyncio.sleep(0.5)
 
-            await x.edit_text("⏳️ ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ...")
+                await x.edit_text("⏳️ ᴘʟᴇᴀsᴇ ᴡᴀɪᴛ...")
 
-            await asyncio.sleep(0.5)
+                await asyncio.sleep(0.5)
 
-            await x.delete()
+                await x.delete()
 
-            for msg_id in range(first_id, last_id + 1):
+                for msg_id in range(first_id, last_id + 1):
 
-                try:
+                    try:
 
-                    msg = await client.get_messages(CHANNEL_ID, msg_id)
+                        msg = await client.get_messages(
+                            CHANNEL_ID,
+                            msg_id
+                        )
 
-                    original_caption = msg.caption if msg.caption else ""
+                        original_caption = msg.caption if msg.caption else ""
 
-                    caption = (
-                        f"**{original_caption}**\n\n"
-                        f"**›› Cʜᴀɴɴᴇʟ :** "
-                        f"[ᴀɴɪᴍᴇ ᴜᴘᴅᴀᴛᴇs](https://t.me/Anime_UpdatesAU)"
-                    )
+                        caption = (
+                            f"**{original_caption}**\n\n"
+                            f"**›› Cʜᴀɴɴᴇʟ :** "
+                            f"[ᴀɴɪᴍᴇ ᴜᴘᴅᴀᴛᴇs](https://t.me/Anime_UpdatesAU)"
+                        )
 
-                    buttons = InlineKeyboardMarkup(
-                        [[
-                            InlineKeyboardButton(
-                                "ᴜᴘᴅᴀᴛᴇs",
-                                url="https://t.me/Anime_UpdatesAU"
+                        buttons = InlineKeyboardMarkup(
+                            [[
+                                InlineKeyboardButton(
+                                    "ᴜᴘᴅᴀᴛᴇs",
+                                    url="https://t.me/Anime_UpdatesAU"
+                                )
+                            ]]
+                        )
+
+                        if msg.video:
+
+                            await message.reply_video(
+                                msg.video.file_id,
+                                caption=caption,
+                                reply_markup=buttons,
+                                supports_streaming=True,
+                                parse_mode=ParseMode.MARKDOWN
                             )
-                        ]]
-                    )
 
-                    if msg.video:
+                        elif msg.document:
 
-                        await message.reply_video(
-                            msg.video.file_id,
-                            caption=caption,
-                            reply_markup=buttons,
-                            supports_streaming=True,
-                            parse_mode=ParseMode.MARKDOWN
-                        )
+                            await message.reply_document(
+                                msg.document.file_id,
+                                caption=caption,
+                                reply_markup=buttons,
+                                parse_mode=ParseMode.MARKDOWN
+                            )
 
-                    elif msg.document:
-    
-                        await message.reply_document(
-                            msg.document.file_id,
-                            caption=caption,
-                            reply_markup=buttons,
-                            parse_mode=ParseMode.MARKDOWN
-                        )
+                        elif msg.audio:
 
-                    elif msg.audio:
+                            await message.reply_audio(
+                                msg.audio.file_id,
+                                caption=caption,
+                                reply_markup=buttons,
+                                parse_mode=ParseMode.MARKDOWN
+                            )
 
-                        await message.reply_audio(
-                            msg.audio.file_id,
-                            caption=caption,
-                            reply_markup=buttons,
-                            parse_mode=ParseMode.MARKDOWN
-                        )
+                        elif msg.animation:
 
-                    elif msg.animation:
+                            await message.reply_animation(
+                                msg.animation.file_id,
+                                caption=caption,
+                                reply_markup=buttons,
+                                parse_mode=ParseMode.MARKDOWN
+                            )
 
-                        await message.reply_animation(
-                            msg.animation.file_id,
-                            caption=caption,
-                            reply_markup=buttons,
-                            parse_mode=ParseMode.MARKDOWN
-                        )
+                        elif msg.sticker:
 
-                    elif msg.sticker:
+                            await message.reply_sticker(
+                                msg.sticker.file_id
+                            )
 
-                        await message.reply_sticker(
-                            msg.sticker.file_id
-                        )
+                        await asyncio.sleep(0.3)
 
-                    await asyncio.sleep(0.3)
+                    except Exception as e:
+                        print(e)
 
-                except Exception as e:
-                    print(e)
+                await message.reply_text(
+                    " ⏳ Dᴜᴇ ᴛᴏ ᴄᴏᴘʏʀɪɢʜᴛ ɪssᴜᴇs...\n\n"
+                    " ›› Yᴏᴜʀ ғɪʟᴇs ᴡɪʟʟ ʙᴇ ᴅᴇʟᴇᴛᴇᴅ ᴡɪᴛʜɪɴ 𝟻 ᴍɪɴᴜᴛᴇs.\n"
+                    " ›› Sᴏ ᴘʟᴇᴀsᴇ ғᴏʀᴡᴀʀᴅ ᴛʜᴇᴍ ᴛᴏ sᴀᴠᴇᴅ ᴍᴇssᴀɢᴇs.\n\n"
+                    " ›› 𝗡𝗼𝘁𝗲: ᴜsᴇ 𝗩𝗟𝗖 𝗣𝗹𝗮𝘆𝗲𝗿 ᴏʀ 𝗠𝗫 𝗣𝗹𝗮𝘆𝗲𝗿 ғᴏʀ ʙᴇsᴛ ᴇxᴘᴇʀɪᴇɴᴄᴇ."
+                )
 
-            warn = await message.reply_text(
-                " ⏳ Dᴜᴇ ᴛᴏ ᴄᴏᴘʏʀɪɢʜᴛ ɪssᴜᴇs...\n\n"
-                " ›› Yᴏᴜʀ ғɪʟᴇs ᴡɪʟʟ ʙᴇ ᴅᴇʟᴇᴛᴇᴅ ᴡɪᴛʜɪɴ 𝟻 ᴍɪɴᴜᴛᴇs.\n"
-                " ›› Sᴏ ᴘʟᴇᴀsᴇ ғᴏʀᴡᴀʀᴅ ᴛʜᴇᴍ ᴛᴏ sᴀᴠᴇᴅ ᴍᴇssᴀɢᴇs."
-                " ›› 𝗡𝗼𝘁𝗲: ᴜsᴇ 𝗩𝗟𝗖 𝗣𝗹𝗮𝘆𝗲𝗿 ᴏʀ 𝗠𝗫 𝗣𝗹𝗮𝘆𝗲𝗿 ғᴏʀ ʙᴇsᴛ ᴇxᴘᴇʀɪᴇɴᴄᴇ."
-            )
+                return
 
-            return
-
-    except:
-        pass
+        except Exception as e:
+            print(e)
 
     # ================= SINGLE FILE =================
 
