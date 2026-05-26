@@ -31,6 +31,7 @@ app = Client(
     api_hash=API_HASH,
     bot_token=BOT_TOKEN
 ) 
+
 import base64
 import re
 
@@ -43,7 +44,6 @@ async def get_message_id(client, link):
     try:
         link = link.strip()
 
-        # PRIVATE CHANNEL
         if "/c/" in link:
 
             parts = link.split("/")
@@ -53,7 +53,6 @@ async def get_message_id(client, link):
 
             return chat_id, msg_id
 
-        # PUBLIC CHANNEL
         match = re.search(r"t\.me/([^/]+)/(\d+)", link)
 
         if match:
@@ -100,12 +99,12 @@ async def batch_command(client, message):
     filters.text &
     ~filters.command([
         "start",
+        "batch",
         "stats",
         "broadcast",
         "addadmin",
         "removeadmin",
-        "adminlist",
-        "batch"
+        "adminlist"
     ])
 )
 async def handle_batch(client, message):
