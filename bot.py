@@ -222,9 +222,8 @@ async def start(client, message: Message):
                 last_id = int(last_id)
 
                 wait = await message.reply_text(
-                    "⏳ Sending Files..."
+                    "⏳ sᴇɴᴅɪɴɢ ғɪʟᴇs..."
                 )
-
                 sent_messages = []
                 warn_messages = []
 
@@ -324,8 +323,8 @@ async def start(client, message: Message):
 
                     except Exception as e:
                         print(e)
-
-                await wait.delete()
+                        
+                    await wait.delete()
 
                 await asyncio.sleep(300)
 
