@@ -1,8 +1,5 @@
----
+[![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&pause=1000&color=36BCF7F1&width=435&lines=Welcome+To+Adavance+File+Store+bot;Bot+is+Made+By+Mohammed)](https://git.io/typing-svg)
 
-[![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&pause=1000&color=36BCF7F1&width=435&lines=Welcome+To+Adavance+File+Store+bot;It+is+Amazing+AU+Luffy+File-Store+Bot;Bot+is+Made+By+Mohammed)](https://git.io/typing-svg)
-
----
 ---
 
 <p align="center">
@@ -21,7 +18,20 @@
 </p>
 
 ----
-----
+
+## ⚙️ Configuration Variables
+
+| Variable        | Description                                  | Example / Format              |
+|----------------|----------------------------------------------|-------------------------------|
+| API_ID         | Your Telegram API ID                         | 123456                        |
+| API_HASH       | Your Telegram API Hash                       | abcdef1234567890abcdef       |
+| BOT_TOKEN      | Bot token from BotFather                     | 123456:ABC-DEF1234ghIkl      |
+| MONGO_URI      | MongoDB connection string                    | mongodb+srv://user:pass@...  |
+| OWNER_ID       | Telegram user ID of bot owner                | 987654321                    |
+| BOT_USERNAME   | Bot username (without @)                     | AU_FILESTORE_BOT             |
+| CHANNEL_ID     | Channel ID where bot is connected (Database) | -1001234567890               |
+
+
 
 <details>
 <summary><h3>
@@ -35,25 +45,32 @@
 </a></p>
 </details>
 
-----
-----
-**Render Variables**
+## 🤖 Bot Commands
 
- API_ID 
- 
- API_HASH 
- 
- BOT_TOKEN 
- 
- MONGO_URI 
- 
- OWNER_ID 
- 
- BOT_USERNAME (without  @)
+### 📌 User Commands
 
- CHANNEL_ID
- 
- ----
+| Command | Description | Example |
+|--------|-------------|---------|
+| `start` | Start the bot. If owner/admin sends a file, bot generates a link | `/start` |
+
+---
+
+### 🔐 Admin / Owner Commands
+
+| Command | Description | Example |
+|--------|-------------|---------|
+| `batch` | Store multiple messages from a channel for link generation | `/batch` |
+| `stats` | Check total users and bot statistics (Owner only) | `/stats` |
+| `broadcast` | Send a message to all users (Owner only) | `/broadcast Hello users!` |
+| `addadmin` | Add a new admin using user ID | `/addadmin 123456789` |
+| `removeadmin` | Remove an admin using user ID | `/removeadmin 123456789` |
+
+---
+
+### ⚠️ Note
+- Only **Owner and Admins** can send files to generate links.
+- Batch system works only with **authorized users**.
+
 
 **NOTE**
 
