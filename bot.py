@@ -197,8 +197,8 @@ async def start(client, message: Message):
         try:
 
             decoded = base64.urlsafe_b64decode(
-                param
-            ).decode()
+                param + "=" * (-len(param) % 4)
+            ).decode("utf-8", errors="ignore")
 
             if decoded.startswith("batch:"):
 
