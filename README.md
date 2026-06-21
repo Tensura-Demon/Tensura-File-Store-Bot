@@ -55,6 +55,9 @@
 - ☁️ Deployable on Render, Koyeb, VPS & More
 - 🚀 Lightweight & High-Speed Performance
 - 💯 Easy Setup & User-Friendly Interface
+- 🎊 System Performance 
+- ✨️ Id checker
+- 🤖 checking bot is alive ,friendly 
 
 📂 Supported Media Types
 
@@ -63,17 +66,6 @@
 - 🎵 Audio Files
 - 🖼 GIF / Animations
 - 😄 Stickers
-
-🌟 Advanced Features
-
-- 📦 Batch File Sharing
-- 👑 Owner Controls
-- 🛠 Admin Controls
-- 📢 Mass Broadcast System
-- ⏳ Auto File Expiry
-- 🔗 Permanent Share Links
-- 🔐 Secure Private Storage
-- 🎯 Clean & Modern Interface
 
 ## ⚙️ Configuration Variables
 
@@ -90,7 +82,10 @@
 ## 🤖 Bot Commands
 
 ```
-start - Start the bot and generate file link (Owner/Admin only for file send)
+start - Start the bot and generate single file link (Owner/Admin only for file send)
+system - Show bot system status (CPU, RAM, uptime, etc.)
+id - Get your Telegram user ID
+alive - Check bot is alive or not
 batch - Store multiple messages from channel (Owner/Admin only)
 stats - Check bot users and statistics (Owner only)
 broadcast - Send message to all users (Owner only)
