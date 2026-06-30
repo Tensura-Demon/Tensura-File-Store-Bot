@@ -37,6 +37,8 @@ BOT_USERNAME = must_get("BOT_USERNAME")
 
 CHANNEL_ID = int(must_get("CHANNEL_ID"))
 
+LOG_CHANNEL = int(must_get("LOG_CHANNEL"))
+
 # ------------------------- #
 # Don't Remove Credit 
 # Owner @Mr_Mohammed_29
