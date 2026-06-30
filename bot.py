@@ -10,6 +10,7 @@ from config import *
 from pyrogram.types import InputMediaPhoto
 from pyrogram.enums import ParseMode
 from pyrogram.errors import FloodWait
+from pyrogram.filters import user
 
 # ------------------------- #
 # Don't Remove Credit 
@@ -79,6 +80,7 @@ import re
 # ------------------------- #
 
 BATCH_USERS = {}
+BANNED_USERS = set()
 
 # ================= GET MESSAGE ID =================
 
@@ -226,6 +228,10 @@ async def handle_batch(client, message):
 async def start(client, message: Message):
 
     user_id = message.from_user.id
+
+    if user_id in BANNED_USERS:
+        return await message.reply_text("🚫 You are banned from using this bot.")
+        
     await add_user(message.from_user.id)
 
     # START ANIMATION
@@ -512,6 +518,15 @@ async def save_media(client, message: Message):
 
     await save_file(file_id, file_unique_id, file_type, original_caption, thumb)
 
+    await client.send_message(
+        LOG_CHANNEL,
+        f"📥 New File Saved\n\n"
+        f"User: {message.from_user.mention}\n"
+        f"ID: `{message.from_user.id}`\n"
+        f"Type: {file_type}\n"
+        f"Caption: {original_caption}"
+    )
+
     link = f"https://t.me/{BOT_USERNAME}?start={file_unique_id}"
 
     await message.reply_text(f"🔗 𝗛𝗲𝗿𝗲 𝗜𝘀 𝗬𝗼𝘂𝗿 𝗟𝗶𝗻𝗸:\n{link}")
@@ -607,7 +622,10 @@ async def broadcast(client, message: Message):
         "adminlist",
         "alive",
         "id",
-        "system"
+        "system",
+        "ban",
+        "unban",
+        "Usage"
     ])
 )
 async def auto_add_user(client, message):
@@ -920,6 +938,103 @@ async def system_info(client, message):
         photo="https://graph.org/file/3999f429ad9b0b1317f28-7591e7676c147975c9.jpg",
         caption=text
     )
+
+@app.on_message(filters.command("Usage"))
+async def usage(client, message):
+
+    msg = await message.reply_text(
+        "Extracting all Usage!!"
+    )
+
+    disk = psutil.disk_usage("/")
+    ram = psutil.virtual_memory()
+    swap = psutil.swap_memory()
+    cpu = psutil.cpu_percent()
+
+    net = psutil.net_io_counters()
+
+    process = psutil.Process()
+    bot_cpu = process.cpu_percent()
+    bot_ram = process.memory_info().rss / (1024**2)
+
+    text = (
+        "📊 **System Usage Stats:**\n\n"
+
+        "💾 **Disk Usage:**\n"
+        f"• Total: {disk.total/(1024**3):.2f} GB\n"
+        f"• Used: {disk.used/(1024**3):.2f} GB\n"
+        f"• Free: {disk.free/(1024**3):.2f} GB\n\n"
+
+        "🖥 **RAM Usage:**\n"
+        f"• Total: {ram.total/(1024**3):.2f} GB\n"
+        f"• Used: {ram.used/(1024**3):.2f} GB ({ram.percent}%)\n"
+        f"• Free: {ram.available/(1024**3):.2f} GB\n\n"
+
+        "🔄 **Swap Usage:**\n"
+        f"• Total: {swap.total/(1024**3):.2f} GB\n"
+        f"• Used: {swap.used/(1024**3):.2f} GB ({swap.percent}%)\n"
+        f"• Free: {swap.free/(1024**3):.2f} GB\n\n"
+
+        f"⚡ **CPU Usage:** {cpu}%\n\n"
+
+        "📡 **Network Usage:**\n"
+        f"• Uploaded: {net.bytes_sent/(1024**2):.2f} MB\n"
+        f"• Downloaded: {net.bytes_recv/(1024**2):.2f} MB\n\n"
+
+        "🤖 **Bot Resource Usage:**\n"
+        f"• CPU: {bot_cpu}%\n"
+        f"• Memory: {bot_ram:.2f} MB"
+    )
+
+    await msg.edit_text(text)
+
+# ------------------------- #
+# Don't Remove Credit 
+# Owner @Mr_Mohammed_29
+# ------------------------- #
+
+# BAN USER
+@app.on_message(filters.command("ban") & filters.user(OWNER_ID))
+async def ban_user(client, message):
+
+    if len(message.command) < 2:
+        return await message.reply_text("Reply /ban user_id")
+
+    uid = int(message.command[1])
+    BANNED_USERS.add(uid)
+
+    await message.reply_text(f"🚫 Banned: {uid}")
+
+    await client.send_message(
+        LOG_CHANNEL,
+        f"🚫 User Banned\n\nID: `{uid}`"
+    )
+    
+# ------------------------- #
+# Don't Remove Credit 
+# Owner @Mr_Mohammed_29
+# ------------------------- #
+
+
+# UNBAN USER
+@app.on_message(filters.command("unban") & filters.user(OWNER_ID))
+async def unban_user(client, message):
+
+    if len(message.command) < 2:
+        return await message.reply_text("Reply /unban user_id")
+
+    uid = int(message.command[1])
+
+    if uid in BANNED_USERS:
+        BANNED_USERS.remove(uid)
+
+    await message.reply_text(f"✅ Unbanned: {uid}")
+
+    await client.send_message(
+        LOG_CHANNEL,
+        f"✅ User Unbanned\n\nID: `{uid}`"
+    )
+    
 # ------------------------- #
 # Don't Remove Credit 
 # Owner @Mr_Mohammed_29
