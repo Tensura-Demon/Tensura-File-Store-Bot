@@ -41,7 +41,7 @@ IMAGES = [
 ]
 from database import (
     save_file, get_file, add_user, get_all_users, total_users,
-    add_admin_db, remove_admin_db, is_admin, get_all_admins
+    add_admin_db, remove_admin_db, is_admin, get_all_admins, ban_user_db, unban_user_db, is_banned
 )
 
 # ------------------------- #
@@ -80,7 +80,6 @@ import re
 # ------------------------- #
 
 BATCH_USERS = {}
-BANNED_USERS = set()
 
 # ================= GET MESSAGE ID =================
 
@@ -229,7 +228,7 @@ async def start(client, message: Message):
 
     user_id = message.from_user.id
 
-    if user_id in BANNED_USERS:
+    if await is_banned(user_id):
         return await message.reply_text("🚫 You are banned from using this bot.")
         
     await add_user(message.from_user.id)
@@ -624,15 +623,20 @@ async def broadcast(client, message: Message):
         "id",
         "system",
         "ban",
-        "unban",
-        "usage"
+        "unban"
     ]),
     group=10
 )
 async def auto_add_user(client, message):
-    if message.from_user:
-        await add_user(message.from_user.id)
+    if not message.from_user:
+        return
 
+    user_id = message.from_user.id
+
+    if await is_banned(user_id):
+        return
+
+    await add_user(user_id)
 # ------------------------- #
 # Don't Remove Credit 
 # Owner @Mr_Mohammed_29
@@ -940,55 +944,6 @@ async def system_info(client, message):
         caption=text
     )
 
-@app.on_message(filters.command("usage"))
-async def usage(client, message):
-
-    msg = await message.reply_text(
-        "Extracting all Usage!!"
-    )
-
-    disk = psutil.disk_usage("/")
-    ram = psutil.virtual_memory()
-    swap = psutil.swap_memory()
-    cpu = psutil.cpu_percent()
-
-    net = psutil.net_io_counters()
-
-    process = psutil.Process()
-    bot_cpu = process.cpu_percent()
-    bot_ram = process.memory_info().rss / (1024**2)
-
-    text = (
-        "📊 **System Usage Stats:**\n\n"
-
-        "💾 **Disk Usage:**\n"
-        f"• Total: {disk.total/(1024**3):.2f} GB\n"
-        f"• Used: {disk.used/(1024**3):.2f} GB\n"
-        f"• Free: {disk.free/(1024**3):.2f} GB\n\n"
-
-        "🖥 **RAM Usage:**\n"
-        f"• Total: {ram.total/(1024**3):.2f} GB\n"
-        f"• Used: {ram.used/(1024**3):.2f} GB ({ram.percent}%)\n"
-        f"• Free: {ram.available/(1024**3):.2f} GB\n\n"
-
-        "🔄 **Swap Usage:**\n"
-        f"• Total: {swap.total/(1024**3):.2f} GB\n"
-        f"• Used: {swap.used/(1024**3):.2f} GB ({swap.percent}%)\n"
-        f"• Free: {swap.free/(1024**3):.2f} GB\n\n"
-
-        f"⚡ **CPU Usage:** {cpu}%\n\n"
-
-        "📡 **Network Usage:**\n"
-        f"• Uploaded: {net.bytes_sent/(1024**2):.2f} MB\n"
-        f"• Downloaded: {net.bytes_recv/(1024**2):.2f} MB\n\n"
-
-        "🤖 **Bot Resource Usage:**\n"
-        f"• CPU: {bot_cpu}%\n"
-        f"• Memory: {bot_ram:.2f} MB"
-    )
-
-    await msg.edit_text(text)
-
 # ------------------------- #
 # Don't Remove Credit 
 # Owner @Mr_Mohammed_29
@@ -999,10 +954,11 @@ async def usage(client, message):
 async def ban_user(client, message):
 
     if len(message.command) < 2:
-        return await message.reply_text("Reply /ban user_id")
+        return await message.reply_text("Usage: /ban user_id")
 
     uid = int(message.command[1])
-    BANNED_USERS.add(uid)
+
+    await ban_user_db(uid)
 
     await message.reply_text(f"🚫 Banned: {uid}")
 
@@ -1022,12 +978,11 @@ async def ban_user(client, message):
 async def unban_user(client, message):
 
     if len(message.command) < 2:
-        return await message.reply_text("Reply /unban user_id")
+        return await message.reply_text("Usage: /unban user_id")
 
     uid = int(message.command[1])
 
-    if uid in BANNED_USERS:
-        BANNED_USERS.remove(uid)
+    await unban_user_db(uid)
 
     await message.reply_text(f"✅ Unbanned: {uid}")
 
