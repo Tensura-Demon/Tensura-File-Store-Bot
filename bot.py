@@ -626,7 +626,8 @@ async def broadcast(client, message: Message):
         "ban",
         "unban",
         "usage"
-    ])
+    ]),
+    group=10
 )
 async def auto_add_user(client, message):
     if message.from_user:
