@@ -612,32 +612,21 @@ async def broadcast(client, message: Message):
     filters.private &
     ~filters.service &
     ~filters.command([
-        "start",
-        "batch",
-        "stats",
-        "broadcast",
-        "addadmin",
-        "removeadmin",
-        "adminlist",
-        "alive",
-        "id",
-        "system",
-        "ban",
-        "unban",
-        "bannedusers"
+        "start","batch","stats","broadcast",
+        "addadmin","removeadmin","adminlist",
+        "alive","id","system","ban","unban"
     ]),
     group=10
 )
 async def auto_add_user(client, message):
-
     if not message.from_user:
         return
 
     user_id = message.from_user.id
 
-    # 🚫 BLOCK BANNED USERS FIRST
+    # 🚫 BLOCK BANNED USERS
     if await is_banned(user_id):
-        return
+        return await message.reply_text("🚫 You are banned from using this bot.")
 
     await add_user(user_id)
     
@@ -877,7 +866,7 @@ async def get_id(client, message):
             [
                 InlineKeyboardButton(
                     "👤 Vɪᴇᴡ Pʀᴏғɪʟᴇ",
-                    url=f"https://t.me/{user.username}" if user.username else f"tg://openmessage?user_id={user.id}"
+                    url=f"https://t.me/{user.username}" if user.username else f"tg://user?id={user.id}"
                 )
             ]
         ]
@@ -954,33 +943,22 @@ async def system_info(client, message):
 # ------------------------- #
 
 # BAN USER
-@app.on_message(filters.command("ban") & filters.user(int(OWNER_ID)))
+@app.on_message(filters.command("ban") & filters.user(OWNER_ID))
 async def ban_user(client, message):
-
     if len(message.command) < 2:
         return await message.reply_text("Usage: /ban user_id reason")
 
     uid = int(message.command[1])
-
-    # reason (everything after user_id)
     reason = " ".join(message.command[2:]) if len(message.command) > 2 else "No reason"
 
     await ban_user_db(uid, reason)
 
-    await message.reply_text(f"🚫 Banned: {uid}\n📝 Reason: {reason}")
+    await message.reply_text(f"🚫 Banned: {uid}\nReason: {reason}")
 
     try:
-        await client.send_message(
-            uid,
-            f"🚫 You are banned from this bot.\n📝 Reason: {reason}"
-        )
+        await client.send_message(uid, f"🚫 You are banned\nReason: {reason}")
     except:
         pass
-
-    await client.send_message(
-        LOG_CHANNEL,
-        f"🚫 User Banned\n\nID: `{uid}`\nReason: {reason}"
-    )
     
 # ------------------------- #
 # Don't Remove Credit 
@@ -989,60 +967,38 @@ async def ban_user(client, message):
 
 
 # UNBAN USER
-@app.on_message(filters.command("unban") & filters.user(int(OWNER_ID)))
+@app.on_message(filters.command("unban") & filters.user(OWNER_ID))
 async def unban_user(client, message):
-
     if len(message.command) < 2:
         return await message.reply_text("Usage: /unban user_id")
 
     uid = int(message.command[1])
 
-    # check if user exists in DB
-    user = await banned_users.find_one({"user_id": uid})
-
-    if not user:
-        return await message.reply_text("⚠️ User is not banned.")
-
-    # remove from DB
     await unban_user_db(uid)
 
     await message.reply_text(f"✅ Unbanned: {uid}")
 
-    # notify user
     try:
-        await client.send_message(
-            uid,
-            "✅ You have been unbanned. You can now use the bot again."
-        )
+        await client.send_message(uid, "✅ You are unbanned now")
     except:
         pass
-
-    # log channel
-    await client.send_message(
-        LOG_CHANNEL,
-        f"✅ User Unbanned\n\nID: `{uid}`"
-    )
 
 # ------------------------- #
 # Don't Remove Credit 
 # Owner @Mr_Mohammed_29
 # ------------------------- #
 
-@app.on_message(filters.command("bannedusers") & filters.user(int(OWNER_ID)))
-async def banned_users_list(client, message):
+@app.on_message(filters.command("bannedlist") & filters.user(OWNER_ID))
+async def banned_list(client, message):
+    data = await get_banned_users()
 
-    users = await get_banned_users()
+    if not data:
+        return await message.reply_text("No banned users")
 
-    if not users:
-        return await message.reply_text("✅ No banned users found.")
+    text = "🚫 Banned Users:\n\n"
 
-    text = "🚫 **Banned Users List**\n\n"
-
-    for i, user in enumerate(users, start=1):
-        uid = user.get("user_id")
-        reason = user.get("reason", "No reason")
-
-        text += f"{i}. ID: `{uid}`\n   Reason: {reason}\n\n"
+    for i, u in enumerate(data, 1):
+        text += f"{i}. ID: {u['user_id']}\nReason: {u.get('reason','No reason')}\n\n"
 
     await message.reply_text(text)
     
