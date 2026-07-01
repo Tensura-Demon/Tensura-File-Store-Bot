@@ -625,7 +625,7 @@ async def broadcast(client, message: Message):
         "system",
         "ban",
         "unban",
-        "Usage"
+        "usage"
     ])
 )
 async def auto_add_user(client, message):
@@ -939,7 +939,7 @@ async def system_info(client, message):
         caption=text
     )
 
-@app.on_message(filters.command("Usage"))
+@app.on_message(filters.command("usage"))
 async def usage(client, message):
 
     msg = await message.reply_text(
