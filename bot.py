@@ -41,7 +41,7 @@ IMAGES = [
 ]
 from database import (
     save_file, get_file, add_user, get_all_users, total_users,
-    add_admin_db, remove_admin_db, is_admin, get_all_admins, ban_user_db, unban_user_db, is_banned
+    add_admin_db, remove_admin_db, is_admin, get_all_admins, ban_user_db, unban_user_db, is_banned, get_banned_users
 )
 
 # ------------------------- #
@@ -635,11 +635,12 @@ async def auto_add_user(client, message):
 
     user_id = message.from_user.id
 
-    # 🚫 BLOCK BANNED USERS
+    # 🚫 BLOCK BANNED USERS FIRST
     if await is_banned(user_id):
         return
 
     await add_user(user_id)
+    
 # ------------------------- #
 # Don't Remove Credit 
 # Owner @Mr_Mohammed_29
@@ -837,7 +838,7 @@ async def refresh_stats(client, query):
 # ALIVE COMMAND
 # ------------------------- #
 
-@app.on_message(filters.command("alive"))
+@app.on_message(filters.command("alive") & filters.private)
 async def alive(client, message):
 
     await message.reply_photo(
@@ -857,7 +858,7 @@ async def alive(client, message):
 # ID COMMAND
 # ------------------------- #
 
-@app.on_message(filters.command("id"))
+@app.on_message(filters.command("id") & filters.private)
 async def get_id(client, message):
 
     user = message.from_user
@@ -915,7 +916,7 @@ async def get_id(client, message):
 # SYSTEM COMMAND
 # ------------------------- #
 
-@app.on_message(filters.command("system"))
+@app.on_message(filters.command("system") & filters.private)
 async def system_info(client, message):
 
     os_name = platform.system()
@@ -953,7 +954,7 @@ async def system_info(client, message):
 # ------------------------- #
 
 # BAN USER
-@app.on_message(filters.command("ban") & filters.user(OWNER_ID))
+@app.on_message(filters.command("ban") & filters.user(int(OWNER_ID)))
 async def ban_user(client, message):
 
     if len(message.command) < 2:
@@ -988,7 +989,7 @@ async def ban_user(client, message):
 
 
 # UNBAN USER
-@app.on_message(filters.command("unban") & filters.user(OWNER_ID))
+@app.on_message(filters.command("unban") & filters.user(int(OWNER_ID)))
 async def unban_user(client, message):
 
     if len(message.command) < 2:
@@ -1027,7 +1028,7 @@ async def unban_user(client, message):
 # Owner @Mr_Mohammed_29
 # ------------------------- #
 
-@app.on_message(filters.command("bannedusers") & filters.user(OWNER_ID))
+@app.on_message(filters.command("bannedusers") & filters.user(int(OWNER_ID)))
 async def banned_users_list(client, message):
 
     users = await get_banned_users()
