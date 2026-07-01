@@ -623,16 +623,19 @@ async def broadcast(client, message: Message):
         "id",
         "system",
         "ban",
-        "unban"
+        "unban",
+        "bannedusers"
     ]),
     group=10
 )
 async def auto_add_user(client, message):
+
     if not message.from_user:
         return
 
     user_id = message.from_user.id
 
+    # 🚫 BLOCK BANNED USERS
     if await is_banned(user_id):
         return
 
