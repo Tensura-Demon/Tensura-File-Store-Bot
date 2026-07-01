@@ -134,10 +134,13 @@ async def is_admin(user_id):
 # Owner @Mr_Mohammed_29
 # ------------------------- #
 
-async def ban_user_db(user_id: int):
+async def ban_user_db(user_id: int, reason: str = "No reason"):
     await banned_users.update_one(
         {"user_id": int(user_id)},
-        {"$set": {"user_id": int(user_id)}},
+        {"$set": {
+            "user_id": int(user_id),
+            "reason": reason
+        }},
         upsert=True
     )
     
@@ -156,10 +159,17 @@ async def unban_user_db(user_id: int):
 # ------------------------- #
 
 async def is_banned(user_id: int):
-    user = await banned_users.find_one({"user_id": int(user_id)})
-    return user is not None
-
+    return await banned_users.find_one({"user_id": int(user_id)})
+    
 # ------------------------- #
 # Don't Remove Credit 
 # Owner @Mr_Mohammed_29
 # ------------------------- #
+
+async def get_banned_users():
+    return [u async for u in banned_users.find({}, {"_id": 0})]
+
+# ------------------------- #
+# Don't Remove Credit 
+# Owner @Mr_Mohammed_29
+# ------------------------- ## 
