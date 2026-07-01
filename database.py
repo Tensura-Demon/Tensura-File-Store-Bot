@@ -19,6 +19,7 @@ db = client.filebot
 files = db.files
 users = db.users
 admins = db["admins"]
+banned_users = db["banned_users"]
 
 # ------------------------- #
 # Don't Remove Credit 
@@ -130,6 +131,35 @@ async def is_admin(user_id):
 
 # ------------------------- #
 # Don't Remove Credit 
+# Owner @Mr_Mohammed_29
+# ------------------------- #
+
+async def ban_user_db(user_id: int):
+    await banned_users.update_one(
+        {"user_id": int(user_id)},
+        {"$set": {"user_id": int(user_id)}},
+        upsert=True
+    )
+    
+# ------------------------- #
+# Don't Remove Credit 
 # Ask Doubt @AU_Bot_Discussion 
 # Owner @Mr_Mohammed_29 
+# ------------------------- #
+
+async def unban_user_db(user_id: int):
+    await banned_users.delete_one({"user_id": int(user_id)})
+
+# ------------------------- #
+# Don't Remove Credit 
+# Owner @Mr_Mohammed_29
+# ------------------------- #
+
+async def is_banned(user_id: int):
+    user = await banned_users.find_one({"user_id": int(user_id)})
+    return user is not None
+
+# ------------------------- #
+# Don't Remove Credit 
+# Owner @Mr_Mohammed_29
 # ------------------------- #
