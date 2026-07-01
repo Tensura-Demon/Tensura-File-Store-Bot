@@ -159,7 +159,8 @@ async def unban_user_db(user_id: int):
 # ------------------------- #
 
 async def is_banned(user_id: int):
-    return await banned_users.find_one({"user_id": int(user_id)})
+    user = await banned_users.find_one({"user_id": int(user_id)})
+    return bool(user)
     
 # ------------------------- #
 # Don't Remove Credit 
@@ -168,8 +169,18 @@ async def is_banned(user_id: int):
 
 async def get_banned_users():
     return [u async for u in banned_users.find({}, {"_id": 0})]
-
 # ------------------------- #
 # Don't Remove Credit 
 # Owner @Mr_Mohammed_29
 # ------------------------- ## 
+
+async def get_ban_reason(user_id: int):
+    user = await banned_users.find_one({"user_id": int(user_id)})
+    if user:
+        return user.get("reason", "No reason")
+    return None
+
+# ------------------------- #
+# Don't Remove Credit 
+# Owner @Mr_Mohammed_29
+# ------------------------- #
